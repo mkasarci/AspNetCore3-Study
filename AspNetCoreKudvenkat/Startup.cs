@@ -38,7 +38,18 @@ namespace AspNetCoreKudvenkat
 
             app.UseRouting();
 
-            app.UseStaticFiles();
+            DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
+            //defaultFilesOptions.DefaultFileNames.Clear();
+            //defaultFilesOptions.DefaultFileNames.Add("foo.html");
+            //app.UseDefaultFiles(defaultFilesOptions);
+            //app.UseStaticFiles(); 
+            //These two middlewares can be replaced with UseFileServer middleware. And also instead of deafultFileOptions we need to use FileServerOptions object for overload the startup page.
+
+            FileServerOptions fileServerOptions = new FileServerOptions();
+            fileServerOptions.DefaultFilesOptions.DefaultFileNames.Clear();
+            fileServerOptions.DefaultFilesOptions.DefaultFileNames.Add("foo.html");
+            app.UseFileServer(fileServerOptions);
+            
 
             app.Use(async (context, next) =>
             {
@@ -54,14 +65,14 @@ namespace AspNetCoreKudvenkat
                 logger.LogInformation("MW2: Outgoing Response");
             });
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync(_config["MyKey"]);
-                    logger.LogInformation("MW3: Request handled and response produced");
-                });
-            });
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapGet("/", async context =>
+            //    {
+            //        await context.Response.WriteAsync("Hello World!");
+            //        logger.LogInformation("MW3: Request handled and response produced");
+            //    });
+            //});
         }
     }
 }
