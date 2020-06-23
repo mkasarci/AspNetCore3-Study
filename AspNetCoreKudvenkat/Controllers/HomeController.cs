@@ -5,6 +5,7 @@ using System.Text.Json;
 
 namespace AspNetCoreKudvenkat.Controllers
 {
+    [Route("[controller]/[action]")] //[controller] token gets the Controller name.
     public class HomeController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
@@ -13,18 +14,22 @@ namespace AspNetCoreKudvenkat.Controllers
             _employeeRepository = employeeRepository;
         }
 
-        public IEmployeeRepository EmployeeRepository { get; }
-
+        [Route("~/")]
+        [Route("~/Home")]
+        [Route("")]
         public IActionResult Index()
         {
             var model = _employeeRepository.GetAllEmployee();
             return View(model);
         }
-        public IActionResult Details()
+        [Route("{id?}")]
+        public IActionResult Details(int? id)
         {
-            HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel();
-            homeDetailsViewModel.Employee = _employeeRepository.GetEmployee(1);
-            homeDetailsViewModel.PageTitle = "Details Page";
+            HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel
+            {
+                Employee = _employeeRepository.GetEmployee(id ?? 1),
+                PageTitle = "Details Page"
+            };
             return View(homeDetailsViewModel);
         }
     }

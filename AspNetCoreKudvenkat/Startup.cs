@@ -48,9 +48,9 @@ namespace AspNetCoreKudvenkat
             app.UseStaticFiles();
             app.UseRouting();
             
-            logger.LogInformation("Before Use MVC.");
-            app.UseMvcWithDefaultRoute();
-            logger.LogInformation("After Use MVC.");
+            // logger.LogInformation("Before Use MVC.");
+            // app.UseMvcWithDefaultRoute();
+            // logger.LogInformation("After Use MVC.");
 
             //DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
             //defaultFilesOptions.DefaultFileNames.Clear();
@@ -78,21 +78,12 @@ namespace AspNetCoreKudvenkat
                 logger.LogInformation("MW2: Outgoing Response");
             });
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
-                {
-                    logger.LogInformation("EndPoint: Incoming Request.");
-                    await context.Response.WriteAsync("Hosting Environment: " + env.EnvironmentName);
-                    logger.LogInformation("EndPoint: Outgoing Response.");
-                });
-            });
+            // app.UseEndpoints (endpoints =>
+            // {
+            //     endpoints.MapControllerRoute("Default", "{controller=Home}/{action=Index}/{id?}");
+            // });
 
-            app.Run(async (context) => {
-                logger.LogInformation("MVC: Incoming Request.");
-                await context.Response.WriteAsync("Hello World!");
-                logger.LogInformation("MVC: Outgoing Response.");
-            });
+            app.UseMvc();
         }
     }
 }
