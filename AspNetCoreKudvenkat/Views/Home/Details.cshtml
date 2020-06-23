@@ -1,0 +1,22 @@
+@model AspNetCoreKudvenkat.ViewModels.HomeDetailsViewModel;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Details</title>
+</head>
+<body>
+    <h1>Hello from @Model.PageTitle!</h1>
+
+    <div>
+        @Model.Employee.Name
+    </div>
+    <div>
+        @Model.Employee.Email
+    </div>
+    <div>
+        @Model.Employee.Department
+    </div>
+</body>
+</html>

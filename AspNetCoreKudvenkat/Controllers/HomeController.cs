@@ -1,8 +1,11 @@
 using AspNetCoreKudvenkat.Models;
+using AspNetCoreKudvenkat.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace AspNetCoreKudvenkat.Controllers
 {
-    public class HomeController
+    public class HomeController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
         public HomeController(IEmployeeRepository employeeRepository)
@@ -12,9 +15,17 @@ namespace AspNetCoreKudvenkat.Controllers
 
         public IEmployeeRepository EmployeeRepository { get; }
 
-        public string Index()
+        public IActionResult Index()
         {
-            return _employeeRepository.GetEmployee(1).Name;
+            var model = _employeeRepository.GetAllEmployee();
+            return View(model);
+        }
+        public IActionResult Details()
+        {
+            HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel();
+            homeDetailsViewModel.Employee = _employeeRepository.GetEmployee(1);
+            homeDetailsViewModel.PageTitle = "Details Page";
+            return View(homeDetailsViewModel);
         }
     }
 }

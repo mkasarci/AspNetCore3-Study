@@ -16,6 +16,11 @@ namespace AspNetCoreKudvenkat.Models
             };
         }
 
+        public IEnumerable<Employee> GetAllEmployee()
+        {
+            return _employeeList;
+        }
+
         public Employee GetEmployee(int Id) => _employeeList.FirstOrDefault(e => e.Id == Id);
     }
 }

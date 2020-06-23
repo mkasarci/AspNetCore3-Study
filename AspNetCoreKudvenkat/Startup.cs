@@ -28,7 +28,7 @@ namespace AspNetCoreKudvenkat
         {
             services.AddMvc(options => {
                 options.EnableEndpointRouting = false;
-            });
+            }).AddXmlSerializerFormatters();
             services.AddSingleton<IEmployeeRepository, MockEmployeeRepository>();
         }
 
