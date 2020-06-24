@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="~/css/site.css" rel="stylesheet" />
-
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/twitter-bootstrap/js/bootstrap.js"></script>
+    <script src=""></script>
     <environment include="Development">
     <link href="~/lib/twitter-bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     </environment>
@@ -24,6 +26,21 @@
     <title>@ViewBag.Title</title>
 </head>
 <body>
+    <nav class="navbar navbar-light navbar-expand-lg bg-light">
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a asp-action="Index" asp-controller="Home" class="nav-link">List</a>
+            </li>
+            <li class="nav-item">
+                <a asp-action="Create" asp-controller="Home" class="nav-link">Create</a>
+            </li>
+        </ul>
+        </div>
+    </nav>
     <div class="container">
         @RenderBody()
     </div>

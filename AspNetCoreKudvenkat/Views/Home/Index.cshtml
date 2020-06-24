@@ -15,10 +15,10 @@
                 @Html.ActionLink("View", "Details", "Home", new { id = employee.Id})-->
                 
                 <a asp-controller="Home" asp-action="Details" asp-route-id="@employee.Id"
-                    class="btn btn-primary">View</a>
+                    class="btn btn-primary m-1">View</a>
                 
-                <a href="#" class="btn btn-secondary">Edit</a>
-                <a href="#" class="btn btn-danger">Delete</a>
+                <a href="#" class="btn btn-secondary m-1">Edit</a>
+                <a href="#" class="btn btn-danger m-1">Delete</a>
             </div>
         </div>
     }
