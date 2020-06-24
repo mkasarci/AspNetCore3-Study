@@ -10,10 +10,17 @@ namespace AspNetCoreKudvenkat.Models
         public MockEmployeeRepository()
         {
             _employeeList = new List<Employee>{
-                new Employee(){Id = 1, Name="Muhammet", Department="IT", Email="muhammed.kasarci@gmail.com"},
-                new Employee(){Id = 2, Name="Ömer Faruk", Department="Management", Email="muhammed.kasarci@gmail.com"},
-                new Employee(){Id = 3, Name="Furkan", Department="IT", Email="muhammed.kasarci@gmail.com"}
+                new Employee(){Id = 1, Name="Muhammet", Department=Department.IT, Email="muhammed.kasarci@gmail.com"},
+                new Employee(){Id = 2, Name="Ömer Faruk", Department=Department.HR, Email="muhammed.kasarci@gmail.com"},
+                new Employee(){Id = 3, Name="Furkan", Department=Department.Management, Email="muhammed.kasarci@gmail.com"}
             };
+        }
+
+        public Employee Add(Employee employee)
+        {
+            employee.Id = _employeeList.Max(e => e.Id) + 1;
+            _employeeList.Add(employee);
+            return employee;
         }
 
         public IEnumerable<Employee> GetAllEmployee()

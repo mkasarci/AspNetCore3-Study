@@ -32,5 +32,18 @@ namespace AspNetCoreKudvenkat.Controllers
             };
             return View(homeDetailsViewModel);
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Employee employee)
+        {
+            Employee addedEmployee = _employeeRepository.Add(employee);
+            return RedirectToAction("Details","Home", new{ id= addedEmployee.Id });
+        }
     }
 }
