@@ -42,8 +42,13 @@ namespace AspNetCoreKudvenkat.Controllers
         [HttpPost]
         public IActionResult Create(Employee employee)
         {
-            Employee addedEmployee = _employeeRepository.Add(employee);
-            return RedirectToAction("Details","Home", new{ id= addedEmployee.Id });
+            if (ModelState.IsValid)
+            {
+                Employee addedEmployee = _employeeRepository.Add(employee);
+                return RedirectToAction("Details","Home", new{ id= addedEmployee.Id });
+            }
+            ModelState.AddModelError(string.Empty, "An error accured!");
+            return View();
         }
     }
 }
