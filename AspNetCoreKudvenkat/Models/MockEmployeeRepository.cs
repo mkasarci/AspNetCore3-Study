@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,11 +24,36 @@ namespace AspNetCoreKudvenkat.Models
             return employee;
         }
 
+        public Employee Delete(int Id)
+        {
+            Employee deletedEmployee = _employeeList.FirstOrDefault(e => e.Id == Id);
+            if (deletedEmployee is null)
+            {
+                throw new ArgumentNullException();
+            }
+            _employeeList.Remove(deletedEmployee);
+            return deletedEmployee;
+         }
+
         public IEnumerable<Employee> GetAllEmployee()
         {
             return _employeeList;
         }
 
         public Employee GetEmployee(int Id) => _employeeList.FirstOrDefault(e => e.Id == Id);
+
+        public Employee Update(Employee employee)
+        {
+            Employee updatedEmployee = _employeeList.FirstOrDefault(e => e.Id == employee.Id);
+            if (updatedEmployee is null)
+            {
+                throw new ArgumentNullException();
+            }
+            updatedEmployee.Name = employee.Name;
+            updatedEmployee.Email = employee.Email;
+            updatedEmployee.Department = employee.Department;      
+            return updatedEmployee;          
+        }
+
     }
 }

@@ -13,7 +13,6 @@ namespace AspNetCoreKudvenkat.Models{
         [Display(Name = "E-Mail")]
         public string Email { get; set; }     
         [Required]
-        public Department? Department { get; set; }   
-
+        public Department? Department { get; set; }           
     }
 }   
