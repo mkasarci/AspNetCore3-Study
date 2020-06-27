@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "Employee Details";
+    var photoPath = "~/images/" + (Model.Employee.PhotoPath ?? "noimage.png");
 }
 
 <div class="row justify-content-center m-3">
@@ -12,6 +13,8 @@
             </div>
             
             <div class="card-body text-center">
+                <img class="details-imageThumbnail" src="@photoPath" alt="userIMG" asp-append-version="true">
+
                 <h4>Employee ID: @Model.Employee.Id</h4>
                 <h4>Email: @Model.Employee.Email</h4>
                 <h4>Department: @Model.Employee.Department</h4>

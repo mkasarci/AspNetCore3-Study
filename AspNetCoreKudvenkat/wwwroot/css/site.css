@@ -1,3 +1,11 @@
 .btn{
     width: 75px;
 }
+.details-imageThumbnail{
+    height: 200px;
+    width: auto;
+}
+.index-imageThumbnail{
+    height: 150px;
+    width: auto;
+}
