@@ -32,9 +32,24 @@ namespace AspNetCoreKudvenkat.Controllers
         [Route("{id?}")]
         public IActionResult Details(int? id)
         {
+            throw new Exception("Test error");
+
+            if (id is null) 
+            {
+                id = 1;
+            } 
+
+            Employee employee = _employeeRepository.GetEmployee(id.Value);
+
+            if (employee is null)
+            {
+                Response.StatusCode = 404;
+                return View("EmployeeNotFound", id.Value);
+            }
+
             HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel
             {
-                Employee = _employeeRepository.GetEmployee(id ?? 1),
+                Employee = employee,
                 PageTitle = "Details Page"
             };
             return View(homeDetailsViewModel);

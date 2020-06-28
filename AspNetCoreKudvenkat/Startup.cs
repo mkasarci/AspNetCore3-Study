@@ -47,6 +47,11 @@ namespace AspNetCoreKudvenkat
 
                 app.UseDeveloperExceptionPage(developerExceptionPageOptions);
             }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
+            }
             
             app.UseStaticFiles();
             app.UseRouting();
