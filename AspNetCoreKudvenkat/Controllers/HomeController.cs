@@ -51,14 +51,7 @@ namespace AspNetCoreKudvenkat.Controllers
         {
             if (ModelState.IsValid)
             {
-                string uniqueFileName = null;
-                if (model.Photo != null)
-                {
-                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "images"); //wwwroot folder path + /images
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Photo.FileName; 
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    model.Photo.CopyTo(new FileStream(filePath, FileMode.Create));
-                }
+                string uniqueFileName = ProcessUploadedFile(model);
 
                 Employee newEmployee = new Employee
                 {
@@ -73,6 +66,73 @@ namespace AspNetCoreKudvenkat.Controllers
             }
             ModelState.AddModelError(string.Empty, "An error accured!");
             return View();
+        }
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            Employee employee =_employeeRepository.GetEmployee(id);
+            if (employee is null)
+            {
+                throw new ArgumentNullException(nameof(employee));
+            }
+            EmployeeEditViewModel employeeEditViewModel = new EmployeeEditViewModel
+            {
+                Id = employee.Id,
+                Name = employee.Name,
+                Email = employee.Email,
+                Department = employee.Department,
+                ExistingPhotoPath = employee.PhotoPath
+            };
+
+            return View(employeeEditViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(EmployeeEditViewModel employeeEditViewModel)
+        {
+            if (ModelState.IsValid) 
+            {
+
+                Employee employee = new Employee
+                {
+                    Id = employeeEditViewModel.Id,
+                    Name = employeeEditViewModel.Name,
+                    Email = employeeEditViewModel.Email,
+                    Department = employeeEditViewModel.Department,
+                    PhotoPath = employeeEditViewModel.ExistingPhotoPath
+                };
+                if (employeeEditViewModel.Photo != null)
+                {
+                    if (employeeEditViewModel.ExistingPhotoPath != null)
+                    {
+                        string oldPhotoPath = Path.Combine(_hostingEnvironment.WebRootPath, "images", employeeEditViewModel.ExistingPhotoPath);
+                        System.IO.File.Delete(oldPhotoPath);
+                    }
+                    employee.PhotoPath = ProcessUploadedFile(employeeEditViewModel);
+                }
+
+                _employeeRepository.Update(employee);
+
+                return RedirectToAction("Details","Home",new{Id= employeeEditViewModel.Id});
+            }
+            ModelState.AddModelError(string.Empty, "An error accured!");
+            return View();
+        }
+
+        private string ProcessUploadedFile(EmployeeCreateViewModel employeeEditViewModel)
+        {
+            string uniqueFileName = null;
+                if (employeeEditViewModel.Photo != null)
+                {
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "images"); //wwwroot folder path + /images
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + employeeEditViewModel.Photo.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using(var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        employeeEditViewModel.Photo.CopyTo(fileStream);
+                    }
+                }
+            return uniqueFileName;
         }
     }
 }
