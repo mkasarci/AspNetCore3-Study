@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetCoreKudvenkat.Models
 {
     public class SQLEmployeeRepository : IEmployeeRepository
     {
         private readonly AppDbContext _context;
-        public SQLEmployeeRepository(AppDbContext context)
+        private readonly ILogger<SQLEmployeeRepository> _logger;
+
+        public SQLEmployeeRepository(AppDbContext context,
+                                    ILogger<SQLEmployeeRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
         public Employee Add(Employee employee)
         {
@@ -36,6 +41,7 @@ namespace AspNetCoreKudvenkat.Models
 
         public Employee GetEmployee(int Id)
         {
+            _logger.LogInformation("Get Employee");
             return _context.Employees.Find(Id);
         }
 

@@ -2,6 +2,7 @@ using AspNetCoreKudvenkat.Models;
 using AspNetCoreKudvenkat.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -13,12 +14,15 @@ namespace AspNetCoreKudvenkat.Controllers
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly ILogger _logger;
 
         public HomeController(IEmployeeRepository employeeRepository, 
-                              IWebHostEnvironment hostingEnvironment)
+                              IWebHostEnvironment hostingEnvironment,
+                              ILogger<HomeController> logger)
         {
             _employeeRepository = employeeRepository;
             _hostingEnvironment = hostingEnvironment;
+            _logger = logger;
         }
 
         [Route("~/")]
@@ -32,7 +36,9 @@ namespace AspNetCoreKudvenkat.Controllers
         [Route("{id?}")]
         public IActionResult Details(int? id)
         {
-            throw new Exception("Test error");
+            //throw new Exception("Test error");
+            _logger.LogTrace("Trace Log");
+            _logger.LogDebug("Debug Log");
 
             if (id is null) 
             {
