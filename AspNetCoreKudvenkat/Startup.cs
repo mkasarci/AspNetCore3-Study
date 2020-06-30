@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AspNetCoreKudvenkat.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,9 +40,21 @@ namespace AspNetCoreKudvenkat
             })
             .AddEntityFrameworkStores<AppDbContext>();
             
-            services.AddMvc(options => {
-                options.EnableEndpointRouting = false;
-            }).AddXmlSerializerFormatters();
+            // services.AddMvc(options => {
+            //     options.EnableEndpointRouting = false;
+            // }).AddXmlSerializerFormatters();
+
+            services.AddRazorPages().AddMvcOptions(options =>{
+                var policy = new AuthorizationPolicyBuilder()
+                                .RequireAuthenticatedUser()
+                                .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
+
+            services.AddAuthorization(options => {
+            
+            });
+
             services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
         }
 
@@ -85,6 +99,8 @@ namespace AspNetCoreKudvenkat
             //     await next.Invoke();
             //     logger.LogInformation("MW2: Outgoing Response");
             // });
+
+            app.UseAuthorization();
 
             app.UseEndpoints (endpoints =>
             {

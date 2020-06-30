@@ -1,5 +1,6 @@
 using AspNetCoreKudvenkat.Models;
 using AspNetCoreKudvenkat.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,12 +29,14 @@ namespace AspNetCoreKudvenkat.Controllers
         [Route("~/")]
         [Route("~/Home")]
         [Route("")]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var model = _employeeRepository.GetAllEmployee();
             return View(model);
         }
         [Route("{id?}")]
+        [AllowAnonymous]
         public IActionResult Details(int? id)
         {
             //throw new Exception("Test error");
