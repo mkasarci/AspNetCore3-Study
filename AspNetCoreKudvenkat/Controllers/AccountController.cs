@@ -56,7 +56,7 @@ namespace AspNetCoreKudvenkat.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string ReturnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -73,7 +73,18 @@ namespace AspNetCoreKudvenkat.Controllers
                 }
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    if(!string.IsNullOrEmpty(ReturnUrl))
+                    {
+                        if (Url.IsLocalUrl(ReturnUrl))
+                        {
+                            return LocalRedirect(ReturnUrl); // if it isn't a local URL throws an exception.
+                        }
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
             }
             else{ return View(); }

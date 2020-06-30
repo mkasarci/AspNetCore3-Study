@@ -139,7 +139,7 @@ namespace AspNetCoreKudvenkat.Controllers
 
                 return RedirectToAction("Details","Home",new{Id= employeeEditViewModel.Id});
             }
-            ModelState.AddModelError(string.Empty, "An error accured!");
+            ModelState.AddModelError(string.Empty, "An error occured!");
             return View();
         }
 
