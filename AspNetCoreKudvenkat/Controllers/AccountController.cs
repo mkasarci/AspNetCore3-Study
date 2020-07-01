@@ -16,6 +16,20 @@ namespace AspNetCoreKudvenkat.Controllers
             _signInManager = signInManager;
             _userManager = userManager;
         }
+        
+        [AcceptVerbs("Get", "Post")]
+        [AllowAnonymous]
+        public async Task<IActionResult> IsEmailInUse(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if(user is null)
+            {
+                return Json(true);
+            }
+            
+            return Json($"Email {email} is already in use!");
+        }
 
         [HttpGet]
         [AllowAnonymous]
