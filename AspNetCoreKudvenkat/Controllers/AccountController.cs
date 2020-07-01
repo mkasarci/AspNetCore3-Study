@@ -8,10 +8,10 @@ namespace AspNetCoreKudvenkat.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        public AccountController(UserManager<IdentityUser> userManager,
-                                SignInManager<IdentityUser> signInManager)
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        public AccountController(UserManager<ApplicationUser> userManager,
+                                SignInManager<ApplicationUser> signInManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -44,7 +44,13 @@ namespace AspNetCoreKudvenkat.Controllers
         {
             if(ModelState.IsValid)
             {
-                var user = new IdentityUser{ UserName = registerViewModel.Email, Email = registerViewModel.Email};
+                var user = new ApplicationUser
+                { 
+                    UserName = registerViewModel.Email,
+                     Email = registerViewModel.Email,
+                      City = registerViewModel.City
+                };
+                
                 var result = await _userManager.CreateAsync(user, registerViewModel.Password);
 
                 if(result.Succeeded)

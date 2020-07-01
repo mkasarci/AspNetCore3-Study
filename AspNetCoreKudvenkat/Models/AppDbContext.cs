@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AspNetCoreKudvenkat.Models
 {
-    public class AppDbContext : IdentityDbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         private readonly DbContextOptions<AppDbContext> options;
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
