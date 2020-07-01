@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using AspNetCoreKudvenkat.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetCoreKudvenkat.Models
@@ -8,6 +9,8 @@ namespace AspNetCoreKudvenkat.Models
         [Required]
         [EmailAddress]
         [Remote(action: "IsEmailInUse", controller: "Account")]
+        [ValidEmailDomain(allowedDomain: "mkcode.com",
+         ErrorMessage = "Email domain must be mkcode.com")]  //Custom attribute
         public string Email { get; set; }
 
         [Required]
