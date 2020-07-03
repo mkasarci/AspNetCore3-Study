@@ -1,0 +1,49 @@
+@model System.Linq.IQueryable<IdentityRole>
+
+@{
+    ViewBag.Title = "Create Role";
+}
+
+<h1 class="mt-4 mb-4">All Roles</h1>
+
+
+
+@if(Model.Any())
+{
+    <a class="btn btn-primary m-1" asp-controller="Administration" asp-action="CreateRole"
+    style="width: auto;">Add New Role</a>
+
+    foreach (var role in Model)
+    {
+       <div class="card mt-2 mb-2">
+           <div class="card-header">
+               Role ID: @role.Id
+           </div>
+           <div class="card-body">
+               @role.Name
+           </div>
+           <div class="card-footer">
+               <a class="btn btn-primary" asp-action="EditRole" 
+               asp-controller="Administration" asp-route-id="@role.Id">Edit</a>
+               <a class="btn btn-danger" href="#">Delete</a>
+           </div>
+       </div>
+    }
+}
+else
+{
+    <div class="card mt-2 mb-2">
+           <div class="card-header">
+               No roles created yet!
+           </div>
+           <div class="card-body">
+               Use the button below to create a role
+           </div>
+           <div class="card-footer">
+               <a class="btn btn-primary" asp-controller="Administration" asp-action="CreateRole"
+    style="width: auto;">Add New Role</a>
+           </div>
+       </div>
+}
+
+
