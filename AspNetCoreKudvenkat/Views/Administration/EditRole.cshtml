@@ -19,11 +19,11 @@
     <div class="form-group row mt-2">
         <button asp-action="EditRole" asp-controller= "Administration" type="submit"
          class="btn btn-primary mr-1">Update</button>
-         <a asp-action="Index" asp-controller="Home" class="btn btn-danger">Cancel</a>
+         <a asp-action="ListRoles" asp-controller="Administration" class="btn btn-danger">Cancel</a>
     </div>
     <div class="card mt-2">
         <div class="card-header">
-            User in this role
+            Users in this role
         </div>
         @if (@Model.Users.Any())
         {
@@ -41,5 +41,10 @@
                 None at the moment.
             </div>
         }
+    </div>
+    <div class="card-footer">
+        <a class="btn btn-outline-primary" style="width: auto;"
+         asp-action="EditUsersInRole" asp-controller="Administration"
+         asp-route-id="@Model.Id">Add or remove users</a>
     </div>
 </form>

@@ -101,9 +101,9 @@ namespace AspNetCoreKudvenkat.Controllers
                 var role = await _roleManager.FindByIdAsync(editRoleViewModel.Id);
                 role.Name = editRoleViewModel.RoleName;
                 var result = await _roleManager.UpdateAsync(role);
-                if(result.Succeeded)
+                if (result.Succeeded)
                 {
-                    return RedirectToAction("ListRoles","Administration");
+                    return RedirectToAction("ListRoles", "Administration");
                 }
                 else
                 {
@@ -115,6 +115,94 @@ namespace AspNetCoreKudvenkat.Controllers
             }
             ModelState.AddModelError(string.Empty, "An error occured!");
             return View(editRoleViewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditUsersInRole(string id)
+        {
+            if (id == null)
+            {
+                ViewBag.ErrorMessage = "RoleId is empty. Please contact with support.";
+                return View("Error/NotFound");
+            }
+
+            ViewBag.roleId = id;
+
+            var role = await _roleManager.FindByIdAsync(id);
+
+            if (role is null)
+            {
+                ViewBag.ErrorMessage = $"Role with Id = {id} cannot be found.";
+                return View("Error/NotFound");
+            }
+
+            var model = new List<UserRoleViewModel>();
+            foreach (var user in _userManager.Users)
+            {
+                var userRoleViewModel = new UserRoleViewModel
+                {
+                    UserId = user.Id,
+                    UserName = user.Email
+                };
+
+                if (await _userManager.IsInRoleAsync(user, role.Name))
+                {
+                    userRoleViewModel.IsSelected = true;
+                }
+                else
+                {
+                    userRoleViewModel.IsSelected = false;
+                }
+
+                model.Add(userRoleViewModel);
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditUsersInRole(string roleId, List<UserRoleViewModel> userRoleViewModels)
+        {
+            if (roleId == null)
+            {
+                ViewBag.ErrorMessage = "RoleId is empty. Please contact with support.";
+                return View("Error/NotFound");
+            }
+
+            var role = await _roleManager.FindByIdAsync(roleId);
+
+            foreach (var user in userRoleViewModels)
+            {
+                var applicationUser = await _userManager.FindByIdAsync(user.UserId);
+
+                IdentityResult result = null;
+
+                if (user.IsSelected && !(await _userManager.IsInRoleAsync(applicationUser, role.Name)))
+                {
+                    result = await _userManager.AddToRoleAsync(applicationUser, role.Name);
+                }
+                else if (!user.IsSelected && (await _userManager.IsInRoleAsync(applicationUser, role.Name)))
+                {
+                    result = await _userManager.RemoveFromRoleAsync(applicationUser, role.Name);
+
+                }
+                else
+                {
+                    continue;
+                }
+
+                if (result.Succeeded)
+                {
+                    continue;
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View();
+            }
+
+            return RedirectToAction("EditRole", "Administration", roleId);
         }
     }
 }
