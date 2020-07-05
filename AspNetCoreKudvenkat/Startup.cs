@@ -37,8 +37,7 @@ namespace AspNetCoreKudvenkat
                 options.Password.RequireUppercase= false;
                 options.Password.RequiredUniqueChars = 3;
                 options.Password.RequireNonAlphanumeric = false;
-            })
-            .AddEntityFrameworkStores<AppDbContext>();
+            }).AddEntityFrameworkStores<AppDbContext>();
             
             // services.AddMvc(options => {
             //     options.EnableEndpointRouting = false;
@@ -51,9 +50,7 @@ namespace AspNetCoreKudvenkat
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
 
-            services.AddAuthorization(options => {
-            
-            });
+            services.AddAuthorization();
 
             services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
         }
