@@ -206,5 +206,12 @@ namespace AspNetCoreKudvenkat.Controllers
 
             return RedirectToAction("EditRole", "Administration", roleId);
         }
+
+        [HttpGet]
+        public IActionResult ListUsers()
+        {
+            var users = _userManager.Users;
+            return View(users);
+        }
     }
 }

@@ -55,6 +55,10 @@ namespace AspNetCoreKudvenkat.Controllers
 
                 if(result.Succeeded)
                 {
+                    if(_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {
+                        return RedirectToAction("ListUsers", "Administration");
+                    }
                     var signInResult = await _signInManager.PasswordSignInAsync(user, registerViewModel.Password, false, true);    
                     return RedirectToAction("Index","Home");
                 }
