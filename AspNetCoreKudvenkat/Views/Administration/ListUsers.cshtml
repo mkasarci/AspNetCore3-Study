@@ -13,7 +13,7 @@
     </a>
      foreach (var user in Model)
      {
-        <div class="card">
+        <div class="card m-2">
             <div class="card-header">
                 <div class="card-text">
                     User ID: @user.Id
@@ -22,8 +22,9 @@
             <div class="card-body">
                 @user.Email
             </div>
-            <div class="card-footer">
-               <a class="btn btn-primary" href="#">Edit</a>
+            <div class="card-footer float-right mr-1">
+               <a class="btn btn-primary" asp-action="EditUser" 
+               asp-controller="Administration" asp-route-id="@user.Id">Edit</a>
                <a class="btn btn-danger" href="#">Delete</a>
            </div>
         </div>

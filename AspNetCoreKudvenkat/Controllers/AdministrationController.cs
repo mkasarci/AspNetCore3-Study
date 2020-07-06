@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AspNetCoreKudvenkat.Controllers
 {
-    [Authorize(Roles="Admin")]
+    [Authorize(Roles = "Admin")]
     public class AdministrationController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -212,6 +212,66 @@ namespace AspNetCoreKudvenkat.Controllers
         {
             var users = _userManager.Users;
             return View(users);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditUser(string Id)
+        {
+            var user = await _userManager.FindByIdAsync(Id);
+
+            if (user is null)
+            {
+                ViewBag.ErrorMessage = $"User with ID = {Id} cannot be found!";
+                return View("Error/NotFound");
+            }
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var editUserViewModel = new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                City = user.City,
+                Claims = userClaims.Select(c => c.Value).ToList(),
+                Roles = userRoles.ToList()
+            };
+            return View(editUserViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditUser(EditUserViewModel editUserViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(editUserViewModel.Id);
+
+                if (user is null)
+                {
+                    ViewBag.ErrorMessage = $"User with ID = {editUserViewModel.Id} cannot be found!";
+                    return View("Error/NotFound");
+                }
+
+                user.UserName = editUserViewModel.UserName;
+                user.Email = editUserViewModel.Email;
+                user.City = editUserViewModel.City;
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListUsers", "Administration");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "An error occured!");
+            return View(editUserViewModel);
         }
     }
 }
