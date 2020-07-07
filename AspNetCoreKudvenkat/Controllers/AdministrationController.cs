@@ -204,7 +204,7 @@ namespace AspNetCoreKudvenkat.Controllers
                 return View();
             }
 
-            return RedirectToAction("EditRole", "Administration", roleId);
+            return RedirectToAction("EditRole", "Administration", new {id = roleId});
         }
 
         [HttpGet]
@@ -296,6 +296,31 @@ namespace AspNetCoreKudvenkat.Controllers
             }
 
             return RedirectToAction("ListUsers");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteRole(string id)
+        {
+            var role = await _roleManager.FindByIdAsync(id);
+
+            if (role is null)
+            {
+                ViewBag.ErrorMessage($"Role with ID = {id} cannot be found!");
+                return View("Error/NotFound");
+            }
+            else
+            {
+                var result = await _roleManager.DeleteAsync(role);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListRoles");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+            return RedirectToAction("ListRoles");
         }
     }
 }
