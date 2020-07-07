@@ -273,5 +273,29 @@ namespace AspNetCoreKudvenkat.Controllers
             ModelState.AddModelError(string.Empty, "An error occured!");
             return View(editUserViewModel);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if(user is null)
+            {
+                ViewBag.ErrorMessage($"User with ID = {id} cannot be found!");
+                return View("Error/NotFound");
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if(result.Succeeded)
+            {
+                return RedirectToAction("ListUsers");
+            }
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return RedirectToAction("ListUsers");
+        }
     }
 }
