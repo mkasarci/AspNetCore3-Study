@@ -322,5 +322,72 @@ namespace AspNetCoreKudvenkat.Controllers
             }
             return RedirectToAction("ListRoles");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageUserRoles(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            ViewBag.userId = id;
+            
+            if(user is null)
+            {
+                ViewBag.ErrorMessage($"User with ID = {id} cannot be found!");
+                return View("Error/NotFound");
+            }
+
+            var roles = _roleManager.Roles;
+            var model = new List<UserRolesViewModel>();
+            
+            foreach (var stringRole in roles)
+            {
+                var role = await _roleManager.FindByNameAsync(stringRole.Name);
+                UserRolesViewModel userRolesViewModel = new UserRolesViewModel
+                {
+                    RoleId = role.Id,
+                    RoleName = role.Name
+                };
+                if (await _userManager.IsInRoleAsync(user, stringRole.Name))
+                {
+                    userRolesViewModel.IsSelected = true;
+                }
+                else
+                {
+                    userRolesViewModel.IsSelected = false;
+                }
+                model.Add(userRolesViewModel);
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ManageUserRoles(List<UserRolesViewModel> modelList, string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user is null)
+            {
+                ViewBag.ErrorMessage($"User with ID = {id} cannot be found!");
+                return View("Error/NotFound");
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var result = await _userManager.RemoveFromRolesAsync(user, roles);
+
+            if(!result.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Cannot remove user existing roles!");
+                return View(modelList);
+            }
+
+            result = await _userManager.AddToRolesAsync(user, modelList.Where(m => m.IsSelected).Select(n => n.RoleName));
+                                                                        
+
+            if(!result.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Cannot add selected roles to user!");
+                return View(modelList);
+            }
+                
+            return RedirectToAction("EditUser", new {id = id});
+        }
     }
 }
