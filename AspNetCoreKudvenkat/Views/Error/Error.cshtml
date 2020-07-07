@@ -1,0 +1,15 @@
+@{
+    ViewBag.Title = "Error Page";
+}
+
+@if (ViewBag.ErrorTitle == null)
+{
+    <h3>An error occured while processing your request.</h3>
+    <h5>The support team is notified and we are working on the fix.</h5>    
+}
+else
+{
+    <h1>@ViewBag.ErrorTitle</h1>
+    <h6>@ViewBag.ErrorMessage</h6>   
+}
+

@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,6 @@ namespace AspNetCoreKudvenkat.Models
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
-        private readonly DbContextOptions<AppDbContext> options;
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }  
@@ -20,6 +20,12 @@ namespace AspNetCoreKudvenkat.Models
                 new Employee{Id=1, Name="Ömer Faruk Kasarcı", Department = Department.Management, Email="ofk@yahoo.com"},
                 new Employee{Id=2, Name="Furkan Kasarcı", Department = Department.Management, Email="furkankasarci@gmail.com"}
             );
+
+            foreach (var foreignKey in modelBuilder.Model.GetEntityTypes()
+                    .SelectMany(e => e.GetForeignKeys()))
+            {
+                foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+            }
         }  
     }
 }
