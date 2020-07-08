@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using AspNetCoreKudvenkat.ViewModels;
+using System.Security.Claims;
 
 namespace AspNetCoreKudvenkat.Controllers
 {
@@ -388,6 +390,76 @@ namespace AspNetCoreKudvenkat.Controllers
             }
                 
             return RedirectToAction("EditUser", new {id = id});
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageUserClaims(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if(user is null)
+            {
+                ViewBag.ErrorMessage($"User with ID = {id} cannot be found!");
+                return View("Error/NotFound");
+            }
+
+            var existingClaims = await _userManager.GetClaimsAsync(user);
+
+            var model = new UserClaimsViewModel
+            {
+                UserId = user.Id
+            };
+
+            foreach (Claim claim in ClaimsStore.AllClaims)
+            {
+                UserClaim userClaim = new UserClaim
+                {
+                    ClaimType = claim.Type
+                };
+
+                if (existingClaims.Any(c => c.Type == claim.Type))
+                {
+                    userClaim.IsSelected = true;
+                }
+
+                model.Claims.Add(userClaim);
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user is null)
+            {
+                ViewBag.ErrorMessage($"User with ID = {model.UserId} cannot be found!");
+                return View("Error/NotFound");
+            }
+            
+            var result = await _userManager.RemoveClaimsAsync(user, ClaimsStore.AllClaims);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model.UserId);
+            }
+
+            await _userManager.AddClaimsAsync(user, model.Claims
+                                                    .Where(c => c.IsSelected)
+                                                    .Select(c => new Claim(c.ClaimType, c.ClaimType)));
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model.UserId);
+            }
+            return RedirectToAction("EditUser", new {Id = model.UserId});
         }
     }
 }
