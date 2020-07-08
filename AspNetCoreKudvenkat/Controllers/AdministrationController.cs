@@ -42,6 +42,7 @@ namespace AspNetCoreKudvenkat.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "CreateRolePolicy")]
         public async Task<IActionResult> CreateRole(CreateRoleViewModel createRoleViewModel)
         {
             if (ModelState.IsValid)
@@ -98,6 +99,7 @@ namespace AspNetCoreKudvenkat.Controllers
             return View(model);
         }
         [HttpPost]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> EditRole(EditRoleViewModel editRoleViewModel)
         {
             if (ModelState.IsValid)
@@ -301,6 +303,7 @@ namespace AspNetCoreKudvenkat.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "DeleteRolePolicy")]
         public async Task<IActionResult> DeleteRole(string id)
         {
             var role = await _roleManager.FindByIdAsync(id);

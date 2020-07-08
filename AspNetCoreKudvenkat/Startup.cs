@@ -50,8 +50,16 @@ namespace AspNetCoreKudvenkat
                                 .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
-
-            services.AddAuthorization();
+            
+            services.AddAuthorization(options => 
+            {
+                options.AddPolicy("CreateRolePolicy" ,
+                                    policy => policy.RequireClaim("Create Role"));
+                options.AddPolicy("EditRolePolicy" ,
+                                    policy => policy.RequireClaim("Edit Role"));
+                options.AddPolicy("DeleteRolePolicy", 
+                                    policy => policy.RequireClaim("Delete Role"));
+            });
 
             services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
         }
