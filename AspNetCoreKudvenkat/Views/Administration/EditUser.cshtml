@@ -83,7 +83,8 @@
              {
                  foreach (var claim in Model.Claims)
                  {
-                     <h5 class="card-text">@claim</h5>
+                     var claimTypeAndValue = claim.Split(':');
+                     <h5 class="card-text">@claimTypeAndValue[0] : @claimTypeAndValue[1]</h5>
                  }
              }
              else

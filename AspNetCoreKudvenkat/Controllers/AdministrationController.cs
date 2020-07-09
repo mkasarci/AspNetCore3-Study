@@ -238,7 +238,7 @@ namespace AspNetCoreKudvenkat.Controllers
                 Email = user.Email,
                 UserName = user.UserName,
                 City = user.City,
-                Claims = userClaims.Select(c => c.Value).ToList(),
+                Claims = userClaims.Select(c => c.Type + " : " + c.Value).ToList(),
                 Roles = userRoles.ToList()
             };
             return View(editUserViewModel);
@@ -420,7 +420,7 @@ namespace AspNetCoreKudvenkat.Controllers
                     ClaimType = claim.Type
                 };
 
-                if (existingClaims.Any(c => c.Type == claim.Type))
+                if (existingClaims.Any(c => c.Type == claim.Type && c.Value == "true"))
                 {
                     userClaim.IsSelected = true;
                 }
@@ -440,7 +440,9 @@ namespace AspNetCoreKudvenkat.Controllers
                 return View("Error/NotFound");
             }
             
-            var result = await _userManager.RemoveClaimsAsync(user, ClaimsStore.AllClaims);
+            var claims = await _userManager.GetClaimsAsync(user);
+            var result = await _userManager.RemoveClaimsAsync(user, claims);
+
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
@@ -451,9 +453,9 @@ namespace AspNetCoreKudvenkat.Controllers
             }
 
             await _userManager.AddClaimsAsync(user, model.Claims
-                                                    .Where(c => c.IsSelected)
-                                                    .Select(c => new Claim(c.ClaimType, c.ClaimType)));
-
+                                                    .Select(c => new Claim(c.ClaimType, 
+                                                                            c.IsSelected ? "true" : "false")));
+            
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)

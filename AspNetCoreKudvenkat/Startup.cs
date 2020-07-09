@@ -54,11 +54,11 @@ namespace AspNetCoreKudvenkat
             services.AddAuthorization(options => 
             {
                 options.AddPolicy("CreateRolePolicy" ,
-                                    policy => policy.RequireClaim("Create Role"));
+                                    policy => policy.RequireClaim("Create Role", "true"));
                 options.AddPolicy("EditRolePolicy" ,
-                                    policy => policy.RequireClaim("Edit Role"));
+                                    policy => policy.RequireClaim("Edit Role", "true"));
                 options.AddPolicy("DeleteRolePolicy", 
-                                    policy => policy.RequireClaim("Delete Role"));
+                                    policy => policy.RequireClaim("Delete Role", "true"));
             });
 
             services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
