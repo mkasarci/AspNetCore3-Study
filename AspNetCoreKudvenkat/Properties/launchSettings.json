@@ -1,10 +1,10 @@
-﻿{
+{
   "iisSettings": {
-    "windowsAuthentication": false, 
-    "anonymousAuthentication": true, 
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:64074",
-      "sslPort": 0
+      "applicationUrl": "https://localhost:44357/",
+      "sslPort": 44357
     }
   },
   "profiles": {
@@ -12,17 +12,17 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "MyKey": "Hello from launchSettings.json => MyKey"
+        "MyKey": "Hello from launchSettings.json => MyKey",
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "AspNetCoreKudvenkat": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:5000"
     }
   }
 }

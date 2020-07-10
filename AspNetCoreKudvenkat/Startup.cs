@@ -51,6 +51,12 @@ namespace AspNetCoreKudvenkat
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
             
+            services.AddAuthentication().AddGoogle(options => 
+            {
+                options.ClientId = "290620975582-aso2qt748ohl5bc3pq75s2pheddmk8rd.apps.googleusercontent.com";
+                options.ClientSecret = "4KEf-GHrPkpYD1S5vLNaFSAk"; 
+            });
+
             services.AddAuthorization(options => 
             {
                 options.AddPolicy("CreateRolePolicy" ,
