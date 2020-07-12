@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using AspNetCoreKudvenkat.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetCoreKudvenkat.Controllers
 {
@@ -12,11 +14,15 @@ namespace AspNetCoreKudvenkat.Controllers
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<AccountController> _logger;
+        private const string error = "Views/Error/Error.cshtml";
         public AccountController(UserManager<ApplicationUser> userManager,
-                                SignInManager<ApplicationUser> signInManager)
+                                SignInManager<ApplicationUser> signInManager,
+                                ILogger<AccountController> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _logger = logger;
         }
         
         [AcceptVerbs("Get", "Post")]
@@ -57,12 +63,21 @@ namespace AspNetCoreKudvenkat.Controllers
 
                 if(result.Succeeded)
                 {
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    
+                    var confirmationLink = Url.Action("ConfirmEmail", "Account", 
+                                                new {userid = user.Id, token = token},
+                                                Request.Scheme);
+
+                    _logger.Log(LogLevel.Warning, confirmationLink);
+
                     if(_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
                         return RedirectToAction("ListUsers", "Administration");
                     }
-                    var signInResult = await _signInManager.PasswordSignInAsync(user, registerViewModel.Password, false, true);    
-                    return RedirectToAction("Index","Home");
+                    ViewBag.ErrorTitle = "Registration Successful";
+                    ViewBag.ErrorMessage = "Before you can login, please confirm your E-mail";
+                    return View(error);
                 }
                 foreach (var error in result.Errors)
                 {
@@ -89,18 +104,31 @@ namespace AspNetCoreKudvenkat.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel, string ReturnUrl)
         {
+            loginViewModel.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            
             if (ModelState.IsValid)
             {
+                var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+
+                if(user != null && !user.EmailConfirmed)
+                {
+                    if (await _userManager.CheckPasswordAsync(user, loginViewModel.Password))
+                    {
+                        ModelState.AddModelError(string.Empty, $"Email Not confirmed yet! {Environment.NewLine} Confirmation URL is in C:\\DemoLogs\\");
+                        return View(loginViewModel);
+                    } 
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, true);
                 if(result.IsLockedOut)
                 {
                     ModelState.AddModelError(string.Empty, "Too many failed login attempts! Wait for a while to login again");
-                    return View();
+                    return View(loginViewModel);
                 }
                 if (result.IsNotAllowed)
                 {
-                    ModelState.AddModelError(string.Empty, "This account is suspended. Please contact with the Customer Support.");
-                    return View();
+                    ModelState.AddModelError(string.Empty, $"Email Not confirmed yet! {Environment.NewLine} Confirmation URL is in C:\\DemoLogs\\");
+                    return View(loginViewModel);
                 }
                 if (result.Succeeded)
                 {
@@ -118,10 +146,10 @@ namespace AspNetCoreKudvenkat.Controllers
                     }
                 }
             }
-            else{ return View(); }
+            else{ return View(loginViewModel); }
 
             ModelState.AddModelError(string.Empty, "Wrong username or password!");
-            return View();
+            return View(loginViewModel);
         }
         [HttpPost]
         public async Task<IActionResult> Logout()
@@ -170,7 +198,10 @@ namespace AspNetCoreKudvenkat.Controllers
                 ModelState.AddModelError(string.Empty, "Error loading external login information.");
                 return View("Login", loginViewModel);
             }
-    
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            ApplicationUser user = null;
+
             var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
             if (signInResult.Succeeded)
             {
@@ -178,12 +209,9 @@ namespace AspNetCoreKudvenkat.Controllers
             }
             else
             {
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-
+                
                 if (email != null)
-                {
-                    var user = await _userManager.FindByEmailAsync(email);
-                    
+                {                    
                     if (user is null)
                     {
                         user = new ApplicationUser
@@ -204,9 +232,41 @@ namespace AspNetCoreKudvenkat.Controllers
                 ViewBag.ErrorTitle = $"Email claim not received from: {info.LoginProvider}";
                 ViewBag.ErrorMessage = "Plaese contact support.";
 
-                return View("Error/Error");
+                return View(error);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userid, string token)
+        {
+            if (userid is null || token is null)
+            {
+                ViewBag.ErrorTitle = $"Invalid Information";
+                ViewBag.ErrorMessage = "User ID Or Token is invalid! Please contact with support.";
+
+                return View(error);
             }
 
+            var user = await _userManager.FindByIdAsync(userid);
+            if (user is null)
+            {
+                ViewBag.ErrorTitle = $"Invalid Information";
+                ViewBag.ErrorMessage = $"User with ID: {userid} couldn't be found! Please contact with support.";
+
+                return View(error);
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return View();
+            }
+             
+            ViewBag.ErrorTitle = "An error occured!";
+            ViewBag.ErrorMessage = $"User with ID: {userid} and token: {token} couldn't be confirmed! Please contact with support.";
+
+            return View(error);
         }
     }
 }

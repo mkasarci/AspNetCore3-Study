@@ -38,7 +38,9 @@ namespace AspNetCoreKudvenkat
                 options.Password.RequiredUniqueChars = 3;
                 options.Password.RequireNonAlphanumeric = false;
                 options.User.RequireUniqueEmail = true;
-            }).AddEntityFrameworkStores<AppDbContext>();
+                options.SignIn.RequireConfirmedEmail = true;
+            }).AddEntityFrameworkStores<AppDbContext>()
+              .AddDefaultTokenProviders();
             
             // services.AddMvc(options => {
             //     options.EnableEndpointRouting = false;
