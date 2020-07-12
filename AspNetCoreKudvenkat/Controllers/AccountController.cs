@@ -3,6 +3,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCoreKudvenkat.Models;
+using AspNetCoreKudvenkat.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -266,6 +267,90 @@ namespace AspNetCoreKudvenkat.Controllers
             ViewBag.ErrorTitle = "An error occured!";
             ViewBag.ErrorMessage = $"User with ID: {userid} and token: {token} couldn't be confirmed! Please contact with support.";
 
+            return View(error);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user is null || !await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    ModelState.AddModelError(string.Empty,"The user cannot be found with this E-mail Address or email has not been confirmed yet.");
+                    return View();
+                }
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var url = Url.Action("ResetPassword", "Account", new {userid = user.Id, token = token}, Request.Scheme);
+                _logger.Log(LogLevel.Warning, url);
+                ViewBag.ErrorTitle = "Forgot Password";
+                ViewBag.ErrorMessage = "Since we haven't got any e-mail provider we've create a log with an URL that you can use to reset you password. Please check the logs.";
+                return View(error);
+            }
+
+            ModelState.AddModelError(string.Empty, "Email Should not be empty.");
+            return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPassword(string userid, string token)
+        {
+            if (userid != null && token != null)
+            {
+                return View();
+            }
+
+            ViewBag.ErrorTitle = "Reset Password";
+            ViewBag.ErrorMessage = $"The User Id: {userid} or token {token} is invalid. Please contact with support.";
+            return View(error); 
+        } 
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+                if (user is null)
+                {
+                    ViewBag.ErrorTitle = "Reset Password";
+                    ViewBag.ErrorMessage = $"The User Id: {model.UserId} or token {model.Token} is invalid. Please contact with support.";
+                    return View(error);
+                }
+                model.Token = model.Token.Replace(" ", "+");
+                var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+                if (result.Succeeded)
+                {
+                    //_signInManager.PasswordSignInAsync(user, user)
+                    ViewBag.ErrorTitle = "Reset Password";
+                    ViewBag.ErrorMessage = "Your password was successfully reset!";
+                    return View(error);
+                }
+
+                string errors = null;
+
+                foreach (var error in result.Errors)
+                {
+                    errors = errors +  $" | {error.Description} | ";
+                }
+                ViewBag.ErrorTitle = "An error occured!";
+                ViewBag.ErrorMessage = errors;
+                return View(error);
+            }
+
+            ViewBag.ErrorTitle = "Something went wrong!";
+            ViewBag.ErrorMessage = "Please check your information and try again.";
             return View(error);
         }
     }
